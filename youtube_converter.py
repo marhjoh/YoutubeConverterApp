@@ -1,9 +1,11 @@
 import os
+import re
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 
 from moviepy.video.io.VideoFileClip import VideoFileClip
 from pytube import YouTube
+from pytube.exceptions import VideoUnavailable, RegexMatchError, PytubeError
 
 
 class YouTubeConverterApp:
@@ -51,8 +53,13 @@ class YouTubeConverterApp:
         url = self.url_entry.get()
         format = self.format_var.get()
         quality = self.quality_var.get()
+
         if not url or not hasattr(self, 'output_path'):
             messagebox.showerror("Error", "Please provide a valid URL and choose an output directory.")
+            return
+
+        if not self.validate_url(url):
+            messagebox.showerror("Error", "Please provide a valid YouTube URL.")
             return
 
         try:
@@ -61,17 +68,40 @@ class YouTubeConverterApp:
                                             file_extension="mp4").first() if format == "MP4" else yt.streams.filter(
                 only_audio=True).first()
 
+            if self.stream is None:
+                raise VideoUnavailable(f"No stream available for the format: {format}")
+
             self.progress['value'] = 0
             output_file = self.stream.download(output_path=self.output_path)
+
             if format == "MP3":
                 base, ext = os.path.splitext(output_file)
                 new_file = base + ".mp3"
-                VideoFileClip(output_file).audio.write_audiofile(new_file)
-                os.remove(output_file)
+                try:
+                    VideoFileClip(output_file).audio.write_audiofile(new_file)
+                    os.remove(output_file)
+                except Exception as e:
+                    os.remove(output_file)
+                    raise e
 
             messagebox.showinfo("Success", "Download and conversion completed successfully!")
+        except RegexMatchError:
+            messagebox.showerror("Error", "Invalid YouTube URL format.")
+        except VideoUnavailable:
+            messagebox.showerror("Error", "The video is unavailable. Please check the URL or try another video.")
+        except PytubeError:
+            messagebox.showerror("Error", "An error occurred with Pytube. Please try again.")
         except Exception as e:
-            messagebox.showerror("Error", str(e))
+            messagebox.showerror("Error", f"An unexpected error occurred: {str(e)}")
+
+    def validate_url(self, url):
+        """
+        Validate the given YouTube URL.
+        """
+        youtube_regex = re.compile(
+            r'^(https?\:\/\/)?(www\.youtube\.com|youtu\.?be)\/.+$'
+        )
+        return re.match(youtube_regex, url) is not None
 
     def choose_directory(self):
         self.output_path = filedialog.askdirectory()
