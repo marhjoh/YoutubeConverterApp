@@ -32,29 +32,29 @@ class YouTubeConverterApp:
         title_label.pack(side="left", padx=10)
 
         # Main content frame
-        content_frame = tk.Frame(self.root)
-        content_frame.pack(padx=20, pady=20)
+        content_frame = tk.Frame(self.root, padx=20, pady=20)
+        content_frame.pack(padx=10, pady=10)
 
-        self.url_label = tk.Label(content_frame, text="YouTube URLs (one per line):")
+        self.url_label = tk.Label(content_frame, text="YouTube URLs (one per line):", anchor="w")
         self.url_label.grid(row=0, column=0, sticky="w", pady=5)
-        self.url_text = tk.Text(content_frame, height=10, width=50)
+        self.url_text = tk.Text(content_frame, height=10, width=50, borderwidth=2, relief="solid")
         self.url_text.grid(row=1, column=0, pady=5, columnspan=2)
 
-        self.format_label = tk.Label(content_frame, text="Select Format:")
+        self.format_label = tk.Label(content_frame, text="Select Format:", anchor="w")
         self.format_label.grid(row=2, column=0, sticky="w", pady=5)
         self.format_var = tk.StringVar(value="MP4")
         self.format_option = tk.OptionMenu(content_frame, self.format_var, "MP3", "MP4")
         self.format_option.grid(row=2, column=1, pady=5, sticky="ew")
 
-        self.quality_label = tk.Label(content_frame, text="Select Quality (MP4 only):")
+        self.quality_label = tk.Label(content_frame, text="Select Quality (MP4 only):", anchor="w")
         self.quality_label.grid(row=3, column=0, sticky="w", pady=5)
         self.quality_var = tk.StringVar(value="720p")
         self.quality_option = tk.OptionMenu(content_frame, self.quality_var, "720p", "1080p")
         self.quality_option.grid(row=3, column=1, pady=5, sticky="ew")
 
-        self.output_button = tk.Button(content_frame, text="Choose Output Directory", command=self.choose_directory)
+        self.output_button = tk.Button(content_frame, text="Choose Output Directory", command=self.choose_directory, bg="#007BFF", fg="white")
         self.output_button.grid(row=4, column=0, pady=5)
-        self.output_label = tk.Label(content_frame, text="No directory chosen", fg="red")
+        self.output_label = tk.Label(content_frame, text="No directory chosen", fg="red", anchor="w")
         self.output_label.grid(row=4, column=1, pady=5, sticky="w")
 
         self.download_button = tk.Button(content_frame, text="Download", command=self.download_videos, bg="#4CAF50", fg="white")
