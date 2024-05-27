@@ -38,6 +38,15 @@ class YouTubeConverterApp:
         self.download_button = tk.Button(self.root, text="Download", command=self.download_video)
         self.download_button.pack(pady=20)
 
+        self.progress = ttk.Progressbar(self.root, orient="horizontal", length=400, mode="determinate")
+        self.progress.pack(pady=20)
+
+    def update_progress(self, stream, chunk, bytes_remaining):
+        size = self.stream.filesize
+        progress = (size - bytes_remaining) / size * 100
+        self.progress['value'] = progress
+        self.root.update_idletasks()
+
     def download_video(self):
         url = self.url_entry.get()
         format = self.format_var.get()
@@ -47,12 +56,13 @@ class YouTubeConverterApp:
             return
 
         try:
-            yt = YouTube(url)
-            stream = yt.streams.filter(progressive=True,
-                                       file_extension="mp4").first() if format == "MP4" else yt.streams.filter(
+            yt = YouTube(url, on_progress_callback=self.update_progress)
+            self.stream = yt.streams.filter(progressive=True,
+                                            file_extension="mp4").first() if format == "MP4" else yt.streams.filter(
                 only_audio=True).first()
 
-            output_file = stream.download(output_path=self.output_path)
+            self.progress['value'] = 0
+            output_file = self.stream.download(output_path=self.output_path)
             if format == "MP3":
                 base, ext = os.path.splitext(output_file)
                 new_file = base + ".mp3"
