@@ -1,6 +1,10 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 from downloader import download_video
+from utils import setup_logging
+
+# Initialize logging
+setup_logging()
 
 class YouTubeConverterApp:
     def __init__(self, root):
