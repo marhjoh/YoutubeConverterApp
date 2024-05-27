@@ -25,6 +25,18 @@ class YouTubeConverterApp:
         self.quality_option = tk.OptionMenu(self.root, self.quality_var, "720p", "1080p")
         self.quality_option.pack(pady=5)
 
+        self.output_button = tk.Button(self.root, text="Choose Output Directory", command=self.choose_directory)
+        self.output_button.pack(pady=5)
+        self.output_label = tk.Label(self.root, text="No directory chosen", fg="red")
+        self.output_label.pack(pady=5)
+
+    def choose_directory(self):
+        self.output_path = filedialog.askdirectory()
+        if self.output_path:
+            self.output_label.config(text=self.output_path, fg="green")
+        else:
+            self.output_label.config(text="No directory chosen", fg="red")
+
 if __name__ == "__main__":
     root = tk.Tk()
     app = YouTubeConverterApp(root)
