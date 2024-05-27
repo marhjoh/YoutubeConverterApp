@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 from downloader import download_video
 from utils import setup_logging
+from PIL import Image, ImageTk  # Make sure to install Pillow
 
 # Initialize logging
 setup_logging()
@@ -14,33 +15,53 @@ class YouTubeConverterApp:
         self.create_menu()
 
     def create_widgets(self):
-        self.url_label = tk.Label(self.root, text="YouTube URLs (one per line):")
-        self.url_label.pack(pady=5)
-        self.url_text = tk.Text(self.root, height=10, width=50)
-        self.url_text.pack(pady=5)
+        # Frame for the header and logo
+        header_frame = tk.Frame(self.root, bg="#f0f0f0")
+        header_frame.pack(fill="x")
 
-        self.format_label = tk.Label(self.root, text="Select Format:")
-        self.format_label.pack(pady=5)
+        # Load and display the logo
+        logo_image = Image.open("logo.png")
+        logo_image = logo_image.resize((200, 100), Image.LANCZOS)  # Use Image.LANCZOS instead of Image.ANTIALIAS
+        logo_photo = ImageTk.PhotoImage(logo_image)
+        logo_label = tk.Label(header_frame, image=logo_photo, bg="#f0f0f0")
+        logo_label.image = logo_photo  # Keep a reference to prevent garbage collection
+        logo_label.pack(side="left", padx=10, pady=10)
+
+        title_label = tk.Label(header_frame, text="YouTube Video to MP3/MP4 Converter",
+                               font=("Helvetica", 18, "bold"), bg="#f0f0f0")
+        title_label.pack(side="left", padx=10)
+
+        # Main content frame
+        content_frame = tk.Frame(self.root)
+        content_frame.pack(padx=20, pady=20)
+
+        self.url_label = tk.Label(content_frame, text="YouTube URLs (one per line):")
+        self.url_label.grid(row=0, column=0, sticky="w", pady=5)
+        self.url_text = tk.Text(content_frame, height=10, width=50)
+        self.url_text.grid(row=1, column=0, pady=5, columnspan=2)
+
+        self.format_label = tk.Label(content_frame, text="Select Format:")
+        self.format_label.grid(row=2, column=0, sticky="w", pady=5)
         self.format_var = tk.StringVar(value="MP4")
-        self.format_option = tk.OptionMenu(self.root, self.format_var, "MP3", "MP4")
-        self.format_option.pack(pady=5)
+        self.format_option = tk.OptionMenu(content_frame, self.format_var, "MP3", "MP4")
+        self.format_option.grid(row=2, column=1, pady=5, sticky="ew")
 
-        self.quality_label = tk.Label(self.root, text="Select Quality (MP4 only):")
-        self.quality_label.pack(pady=5)
+        self.quality_label = tk.Label(content_frame, text="Select Quality (MP4 only):")
+        self.quality_label.grid(row=3, column=0, sticky="w", pady=5)
         self.quality_var = tk.StringVar(value="720p")
-        self.quality_option = tk.OptionMenu(self.root, self.quality_var, "720p", "1080p")
-        self.quality_option.pack(pady=5)
+        self.quality_option = tk.OptionMenu(content_frame, self.quality_var, "720p", "1080p")
+        self.quality_option.grid(row=3, column=1, pady=5, sticky="ew")
 
-        self.output_button = tk.Button(self.root, text="Choose Output Directory", command=self.choose_directory)
-        self.output_button.pack(pady=5)
-        self.output_label = tk.Label(self.root, text="No directory chosen", fg="red")
-        self.output_label.pack(pady=5)
+        self.output_button = tk.Button(content_frame, text="Choose Output Directory", command=self.choose_directory)
+        self.output_button.grid(row=4, column=0, pady=5)
+        self.output_label = tk.Label(content_frame, text="No directory chosen", fg="red")
+        self.output_label.grid(row=4, column=1, pady=5, sticky="w")
 
-        self.download_button = tk.Button(self.root, text="Download", command=self.download_videos)
-        self.download_button.pack(pady=20)
+        self.download_button = tk.Button(content_frame, text="Download", command=self.download_videos, bg="#4CAF50", fg="white")
+        self.download_button.grid(row=5, column=0, columnspan=2, pady=20, ipadx=10, ipady=5)
 
-        self.progress = ttk.Progressbar(self.root, orient="horizontal", length=400, mode="determinate")
-        self.progress.pack(pady=20)
+        self.progress = ttk.Progressbar(content_frame, orient="horizontal", length=400, mode="determinate")
+        self.progress.grid(row=6, column=0, columnspan=2, pady=20)
 
     def create_menu(self):
         menu_bar = tk.Menu(self.root)
