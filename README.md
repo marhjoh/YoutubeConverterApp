@@ -57,3 +57,4 @@ A simple Python application to download and convert YouTube videos to MP3 or MP4
 - `main.py`: Initializes the application and creates the main window.
 - `gui.py`: Contains the GUI logic for the application.
 - `downloader.py`: Contains the core logic for downloading and converting videos.
+- `utils.py`: utility function for logging.
