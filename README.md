@@ -50,6 +50,30 @@ A simple Python application to download and convert YouTube videos to MP3 or MP4
     - Choose the output directory where the files will be saved.
     - Click "Download" to start downloading and converting the videos.
 
+## Common Issues
+
+### HTTP Error 400: Bad Request
+
+This error typically indicates that there is an issue with the URL being passed to the YouTube API. Here are some potential causes and solutions:
+
+1. **Invalid URL Format:**
+    - Ensure the URL is correctly formatted and valid.
+    - Use the clean URL function to remove unnecessary parameters from the URL.
+
+2. **URL with Playlist or Additional Parameters:**
+    - If the URL contains a playlist or other additional parameters, it might not be handled correctly by `pytube`.
+    - The application includes a function to clean the URL, ensuring it only contains the video ID parameter.
+
+3. **API Restrictions or Quotas:**
+    - There might be restrictions or quotas on the YouTube API usage.
+    - Ensure that the requests are not exceeding any limits.
+
+4. **Unsupported Video Types:**
+    - Some videos might be restricted or not supported for download by `pytube`.
+    - Check if the video is available for public viewing and not restricted.
+
+To address these issues, the application uses a `clean_url` function to ensure the URL is correctly formatted before being processed.
+
 ## Development
 
 ### Code Structure
