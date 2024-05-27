@@ -53,7 +53,13 @@ class YouTubeConverterApp:
         help_menu.add_command(label="About", command=self.show_about)
 
     def show_about(self):
-        messagebox.showinfo("About", "YouTube Video to MP3/MP4 Converter\nVersion 1.0")
+        about_text = (
+            "YouTube Video to MP3/MP4 Converter\n"
+            "Version 1.0\n"
+            "Author: Martin Hegnum Johannessen\n"
+            "GitHub: https://github.com/marhjoh/YoutubeConverterApp"
+        )
+        messagebox.showinfo("About", about_text)
 
     def update_progress(self, stream, chunk, bytes_remaining):
         size = stream.filesize
