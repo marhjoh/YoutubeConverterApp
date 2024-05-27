@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import filedialog, messagebox, ttk
+from tkinter import filedialog, messagebox, ttk, simpledialog
 from downloader import download_video
 from utils import setup_logging
 from PIL import Image, ImageTk
@@ -47,28 +47,34 @@ class YouTubeConverterApp:
         self.urls_listbox = tk.Listbox(content_frame, height=10, width=70, borderwidth=2, relief="solid")
         self.urls_listbox.grid(row=1, column=0, columnspan=3, pady=5)
 
+        self.edit_url_button = tk.Button(content_frame, text="Edit URL", command=self.edit_url, bg="#FF9800", fg="white")
+        self.edit_url_button.grid(row=2, column=0, pady=5)
+
+        self.remove_url_button = tk.Button(content_frame, text="Remove URL", command=self.remove_url, bg="#F44336", fg="white")
+        self.remove_url_button.grid(row=2, column=1, pady=5)
+
         self.format_label = tk.Label(content_frame, text="Select Format:", anchor="w")
-        self.format_label.grid(row=2, column=0, sticky="w", pady=5)
+        self.format_label.grid(row=3, column=0, sticky="w", pady=5)
         self.format_var = tk.StringVar(value="MP4")
         self.format_option = tk.OptionMenu(content_frame, self.format_var, "MP3", "MP4")
-        self.format_option.grid(row=2, column=1, pady=5, sticky="ew")
+        self.format_option.grid(row=3, column=1, pady=5, sticky="ew")
 
         self.quality_label = tk.Label(content_frame, text="Select Quality (MP4 only):", anchor="w")
-        self.quality_label.grid(row=3, column=0, sticky="w", pady=5)
+        self.quality_label.grid(row=4, column=0, sticky="w", pady=5)
         self.quality_var = tk.StringVar(value="720p")
         self.quality_option = tk.OptionMenu(content_frame, self.quality_var, "720p", "1080p")
-        self.quality_option.grid(row=3, column=1, pady=5, sticky="ew")
+        self.quality_option.grid(row=4, column=1, pady=5, sticky="ew")
 
         self.output_button = tk.Button(content_frame, text="Choose Output Directory", command=self.choose_directory, bg="#007BFF", fg="white")
-        self.output_button.grid(row=4, column=0, pady=5)
+        self.output_button.grid(row=5, column=0, pady=5)
         self.output_label = tk.Label(content_frame, text="No directory chosen", fg="red", anchor="w")
-        self.output_label.grid(row=4, column=1, pady=5, sticky="w")
+        self.output_label.grid(row=5, column=1, pady=5, sticky="w")
 
         self.download_button = tk.Button(content_frame, text="Download", command=self.download_videos, bg="#4CAF50", fg="white")
-        self.download_button.grid(row=5, column=0, columnspan=3, pady=20, ipadx=10, ipady=5)
+        self.download_button.grid(row=6, column=0, columnspan=3, pady=20, ipadx=10, ipady=5)
 
         self.progress = ttk.Progressbar(content_frame, orient="horizontal", length=400, mode="determinate")
-        self.progress.grid(row=6, column=0, columnspan=3, pady=20)
+        self.progress.grid(row=7, column=0, columnspan=3, pady=20)
 
     def create_menu(self):
         menu_bar = tk.Menu(self.root)
@@ -105,6 +111,23 @@ class YouTubeConverterApp:
             self.urls.append(url)
             self.update_url_listbox()
             self.url_entry.delete(0, tk.END)
+
+    def edit_url(self):
+        selected_idx = self.urls_listbox.curselection()
+        if selected_idx:
+            idx = selected_idx[0]
+            url = self.urls[idx]
+            new_url = simpledialog.askstring("Edit URL", "Edit the URL:", initialvalue=url)
+            if new_url:
+                self.urls[idx] = new_url
+                self.update_url_listbox()
+
+    def remove_url(self):
+        selected_idx = self.urls_listbox.curselection()
+        if selected_idx:
+            idx = selected_idx[0]
+            del self.urls[idx]
+            self.update_url_listbox()
 
     def update_url_listbox(self):
         self.urls_listbox.delete(0, tk.END)
