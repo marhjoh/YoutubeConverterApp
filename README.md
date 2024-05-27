@@ -2,6 +2,8 @@
 
 A simple Python application to download and convert YouTube videos to MP3 or MP4 format, featuring a graphical user interface (GUI) for ease of use.
 
+![UI Screenshot](C:\Users\marti\Downloads\readmeimage.png)
+
 ## Features
 
 - Convert YouTube videos to MP3.
