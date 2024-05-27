@@ -7,12 +7,13 @@ class YouTubeConverterApp:
         self.root = root
         self.root.title("YouTube Video to MP3/MP4 Converter")
         self.create_widgets()
+        self.create_menu()
 
     def create_widgets(self):
-        self.url_label = tk.Label(self.root, text="YouTube URL:")
+        self.url_label = tk.Label(self.root, text="YouTube URLs (one per line):")
         self.url_label.pack(pady=5)
-        self.url_entry = tk.Entry(self.root, width=50)
-        self.url_entry.pack(pady=5)
+        self.url_text = tk.Text(self.root, height=10, width=50)
+        self.url_text.pack(pady=5)
 
         self.format_label = tk.Label(self.root, text="Select Format:")
         self.format_label.pack(pady=5)
@@ -31,29 +32,51 @@ class YouTubeConverterApp:
         self.output_label = tk.Label(self.root, text="No directory chosen", fg="red")
         self.output_label.pack(pady=5)
 
-        self.download_button = tk.Button(self.root, text="Download", command=self.download_video)
+        self.download_button = tk.Button(self.root, text="Download", command=self.download_videos)
         self.download_button.pack(pady=20)
 
         self.progress = ttk.Progressbar(self.root, orient="horizontal", length=400, mode="determinate")
         self.progress.pack(pady=20)
 
+    def create_menu(self):
+        menu_bar = tk.Menu(self.root)
+        self.root.config(menu=menu_bar)
+
+        file_menu = tk.Menu(menu_bar, tearoff=0)
+        menu_bar.add_cascade(label="File", menu=file_menu)
+        file_menu.add_command(label="Choose Output Directory", command=self.choose_directory)
+        file_menu.add_separator()
+        file_menu.add_command(label="Exit", command=self.root.quit)
+
+        help_menu = tk.Menu(menu_bar, tearoff=0)
+        menu_bar.add_cascade(label="Help", menu=help_menu)
+        help_menu.add_command(label="About", command=self.show_about)
+
+    def show_about(self):
+        messagebox.showinfo("About", "YouTube Video to MP3/MP4 Converter\nVersion 1.0")
+
     def update_progress(self, stream, chunk, bytes_remaining):
-        size = self.stream.filesize
+        size = stream.filesize
         progress = (size - bytes_remaining) / size * 100
         self.progress['value'] = progress
         self.root.update_idletasks()
 
-    def download_video(self):
-        url = self.url_entry.get()
+    def download_videos(self):
+        urls = self.url_text.get("1.0", tk.END).strip().split("\n")
         format = self.format_var.get()
         quality = self.quality_var.get()
 
-        if not url or not hasattr(self, 'output_path'):
-            messagebox.showerror("Error", "Please provide a valid URL and choose an output directory.")
+        if not urls or not hasattr(self, 'output_path'):
+            messagebox.showerror("Error", "Please provide valid URLs and choose an output directory.")
             return
 
-        self.progress['value'] = 0
-        download_video(url, format, quality, self.output_path, self.update_progress)
+        for url in urls:
+            try:
+                self.progress['value'] = 0
+                download_video(url, format, quality, self.output_path, self.update_progress)
+                messagebox.showinfo("Success", f"Download and conversion of {url} completed successfully!")
+            except Exception as e:
+                messagebox.showerror("Error", f"An error occurred with {url}: {str(e)}")
 
     def choose_directory(self):
         self.output_path = filedialog.askdirectory()
