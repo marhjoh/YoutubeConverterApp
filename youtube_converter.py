@@ -19,6 +19,12 @@ class YouTubeConverterApp:
         self.format_option = tk.OptionMenu(self.root, self.format_var, "MP3", "MP4")
         self.format_option.pack(pady=5)
 
+        self.quality_label = tk.Label(self.root, text="Select Quality (MP4 only):")
+        self.quality_label.pack(pady=5)
+        self.quality_var = tk.StringVar(value="720p")
+        self.quality_option = tk.OptionMenu(self.root, self.quality_var, "720p", "1080p")
+        self.quality_option.pack(pady=5)
+
 if __name__ == "__main__":
     root = tk.Tk()
     app = YouTubeConverterApp(root)
