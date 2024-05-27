@@ -1,5 +1,10 @@
+import os
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
+
+from moviepy.video.io.VideoFileClip import VideoFileClip
+from pytube import YouTube
+
 
 class YouTubeConverterApp:
     def __init__(self, root):
@@ -29,6 +34,34 @@ class YouTubeConverterApp:
         self.output_button.pack(pady=5)
         self.output_label = tk.Label(self.root, text="No directory chosen", fg="red")
         self.output_label.pack(pady=5)
+
+        self.download_button = tk.Button(self.root, text="Download", command=self.download_video)
+        self.download_button.pack(pady=20)
+
+    def download_video(self):
+        url = self.url_entry.get()
+        format = self.format_var.get()
+        quality = self.quality_var.get()
+        if not url or not hasattr(self, 'output_path'):
+            messagebox.showerror("Error", "Please provide a valid URL and choose an output directory.")
+            return
+
+        try:
+            yt = YouTube(url)
+            stream = yt.streams.filter(progressive=True,
+                                       file_extension="mp4").first() if format == "MP4" else yt.streams.filter(
+                only_audio=True).first()
+
+            output_file = stream.download(output_path=self.output_path)
+            if format == "MP3":
+                base, ext = os.path.splitext(output_file)
+                new_file = base + ".mp3"
+                VideoFileClip(output_file).audio.write_audiofile(new_file)
+                os.remove(output_file)
+
+            messagebox.showinfo("Success", "Download and conversion completed successfully!")
+        except Exception as e:
+            messagebox.showerror("Error", str(e))
 
     def choose_directory(self):
         self.output_path = filedialog.askdirectory()
