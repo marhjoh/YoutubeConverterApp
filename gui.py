@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 from downloader import download_video
 from utils import setup_logging
-from PIL import Image, ImageTk  # Make sure to install Pillow
+from PIL import Image, ImageTk
 
 # Initialize logging
 setup_logging()
@@ -11,6 +11,7 @@ class YouTubeConverterApp:
     def __init__(self, root):
         self.root = root
         self.root.title("YouTube Video to MP3/MP4 Converter")
+        self.urls = []
         self.create_widgets()
         self.create_menu()
 
@@ -21,10 +22,10 @@ class YouTubeConverterApp:
 
         # Load and display the logo
         logo_image = Image.open("logo.png")
-        logo_image = logo_image.resize((200, 100), Image.LANCZOS)  # Use Image.LANCZOS instead of Image.ANTIALIAS
+        logo_image = logo_image.resize((200, 100), Image.LANCZOS)
         logo_photo = ImageTk.PhotoImage(logo_image)
         logo_label = tk.Label(header_frame, image=logo_photo, bg="#f0f0f0")
-        logo_label.image = logo_photo  # Keep a reference to prevent garbage collection
+        logo_label.image = logo_photo
         logo_label.pack(side="left", padx=10, pady=10)
 
         title_label = tk.Label(header_frame, text="YouTube Video to MP3/MP4 Converter",
@@ -35,10 +36,16 @@ class YouTubeConverterApp:
         content_frame = tk.Frame(self.root, padx=20, pady=20)
         content_frame.pack(padx=10, pady=10)
 
-        self.url_label = tk.Label(content_frame, text="YouTube URLs (one per line):", anchor="w")
+        self.url_label = tk.Label(content_frame, text="Enter YouTube URL:", anchor="w")
         self.url_label.grid(row=0, column=0, sticky="w", pady=5)
-        self.url_text = tk.Text(content_frame, height=10, width=50, borderwidth=2, relief="solid")
-        self.url_text.grid(row=1, column=0, pady=5, columnspan=2)
+        self.url_entry = tk.Entry(content_frame, width=50, borderwidth=2, relief="solid")
+        self.url_entry.grid(row=0, column=1, pady=5, sticky="ew")
+
+        self.add_url_button = tk.Button(content_frame, text="Add URL", command=self.add_url, bg="#007BFF", fg="white")
+        self.add_url_button.grid(row=0, column=2, padx=5)
+
+        self.urls_listbox = tk.Listbox(content_frame, height=10, width=70, borderwidth=2, relief="solid")
+        self.urls_listbox.grid(row=1, column=0, columnspan=3, pady=5)
 
         self.format_label = tk.Label(content_frame, text="Select Format:", anchor="w")
         self.format_label.grid(row=2, column=0, sticky="w", pady=5)
@@ -58,10 +65,10 @@ class YouTubeConverterApp:
         self.output_label.grid(row=4, column=1, pady=5, sticky="w")
 
         self.download_button = tk.Button(content_frame, text="Download", command=self.download_videos, bg="#4CAF50", fg="white")
-        self.download_button.grid(row=5, column=0, columnspan=2, pady=20, ipadx=10, ipady=5)
+        self.download_button.grid(row=5, column=0, columnspan=3, pady=20, ipadx=10, ipady=5)
 
         self.progress = ttk.Progressbar(content_frame, orient="horizontal", length=400, mode="determinate")
-        self.progress.grid(row=6, column=0, columnspan=2, pady=20)
+        self.progress.grid(row=6, column=0, columnspan=3, pady=20)
 
     def create_menu(self):
         menu_bar = tk.Menu(self.root)
@@ -92,16 +99,27 @@ class YouTubeConverterApp:
         self.progress['value'] = progress
         self.root.update_idletasks()
 
-    def download_videos(self):
-        urls = self.url_text.get("1.0", tk.END).strip().split("\n")
-        format = self.format_var.get()
-        quality = self.quality_var.get()
+    def add_url(self):
+        url = self.url_entry.get()
+        if url:
+            self.urls.append(url)
+            self.update_url_listbox()
+            self.url_entry.delete(0, tk.END)
 
-        if not urls or not hasattr(self, 'output_path'):
+    def update_url_listbox(self):
+        self.urls_listbox.delete(0, tk.END)
+        for idx, url in enumerate(self.urls, start=1):
+            self.urls_listbox.insert(tk.END, f"{idx}. {url}")
+
+    def download_videos(self):
+        if not self.urls or not hasattr(self, 'output_path'):
             messagebox.showerror("Error", "Please provide valid URLs and choose an output directory.")
             return
 
-        for url in urls:
+        format = self.format_var.get()
+        quality = self.quality_var.get()
+
+        for url in self.urls:
             try:
                 self.progress['value'] = 0
                 download_video(url, format, quality, self.output_path, self.update_progress)

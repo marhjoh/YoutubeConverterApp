@@ -5,7 +5,6 @@ from moviepy.video.io.VideoFileClip import VideoFileClip
 from utils import validate_url, setup_logging
 import logging
 
-# Initialize logging
 setup_logging()
 
 def download_video(url, format, quality, output_path, progress_callback):
