@@ -8,7 +8,16 @@ class YouTubeConverterApp:
         self.create_widgets()
 
     def create_widgets(self):
-        pass
+        self.url_label = tk.Label(self.root, text="YouTube URL:")
+        self.url_label.pack(pady=5)
+        self.url_entry = tk.Entry(self.root, width=50)
+        self.url_entry.pack(pady=5)
+
+        self.format_label = tk.Label(self.root, text="Select Format:")
+        self.format_label.pack(pady=5)
+        self.format_var = tk.StringVar(value="MP4")
+        self.format_option = tk.OptionMenu(self.root, self.format_var, "MP3", "MP4")
+        self.format_option.pack(pady=5)
 
 if __name__ == "__main__":
     root = tk.Tk()
